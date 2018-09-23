@@ -6,12 +6,11 @@ import (
     "github.com/gin-gonic/gin"                           // Using gin as microframework
     "github.com/jinzhu/gorm"                             //Using gorm as orm
     _ "github.com/jinzhu/gorm/dialects/sqlite"           //Using sqlite as db
-
 )
 
 type Genre struct{
     ID uint `json:"id"`
-    Name string `json:"name"`
+    Name string `gorm:"type:varchar(100);unique_index" json:"name"`
 }
 
 /*func DataBaseOpener() *gorm.DB{
@@ -79,7 +78,8 @@ func GetGenre(c *gin.Context) {
 
    id := c.Params.ByName("id")
    var genre Genre
-   if check := db.Where("id = ?", id).First(&genre).Error; err != nil {
+   if check := db.Where("id = ?", id).First(&genre).Error;
+   check != nil {
       c.AbortWithStatus(404)
       fmt.Println(check)
    } else {
