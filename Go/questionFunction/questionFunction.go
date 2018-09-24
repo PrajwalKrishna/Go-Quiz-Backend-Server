@@ -13,6 +13,7 @@ type Question struct{
     Answer string `gorm:"type:varchar(4)" json:"answer"`
     Quiz_id uint `json:"quiz_id"`
     Multi bool `json:"multi"`
+    Score int `json:"score"`
 }
 
 func DataBaseOpener() *gorm.DB{
@@ -22,6 +23,25 @@ func DataBaseOpener() *gorm.DB{
     }
     defer db.Close()
     return db
+}
+
+func UpdateQuestion(c *gin.Context) {
+    db, err := gorm.Open("sqlite3", "./gorm.db")
+    if err != nil {
+        panic("failed to connect table")
+    }
+    defer db.Close()
+
+   var question Question
+   id := c.Params.ByName("id")
+   if err := db.Where("id = ?", id).First(&question).Error; err != nil {
+      c.AbortWithStatus(404)
+      fmt.Println(err)
+   }
+   c.BindJSON(&question)
+   db.Save(&question)
+   //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.JSON(200, question)
 }
 
 func GetAllQuestions(c *gin.Context) {

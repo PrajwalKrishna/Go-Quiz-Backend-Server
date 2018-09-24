@@ -7,20 +7,15 @@ import (
    "github.com/jinzhu/gorm"                             //Using gorm as orm
    _ "github.com/jinzhu/gorm/dialects/sqlite"           //Using sqlite as db
 
+   user "./userFunction"
    genre  "./genreFunction"
    question "./questionFunction"
    quiz "./quizFunction"
+   leaderboard "./leaderboardFunction"
 )
 
 var db *gorm.DB                                         // declaring the db globally
 var err error
-
-type Person struct{
-       ID uint `json:"id"`
-       FirstName string `json:"firstname"`
-       LastName string `json:"lastname"`
-       City string `json:"city"`
-}
 
 func main() {
    fmt.Println("Starting")
@@ -31,19 +26,20 @@ func main() {
    defer db.Close()
 
    //Commands for database
-   //db.AutoMigrate(&Person{})
+   db.AutoMigrate(&user.User{})
    db.AutoMigrate(&genre.Genre{})
    db.AutoMigrate(&quiz.Quiz{})
    db.AutoMigrate(&question.Question{})
+   db.AutoMigrate(&leaderboard.Leaderboard{})
    //db.Model(&question.Question{}).AddForeignKey("genre_id", "genres(id)", "RESTRICT", "RESTRICT")
    r := gin.Default()                                        //Starting gin server
 
-   /*r.GET("/people/", GetPeople)                             // Creating routes for each functionality
-   r.GET("/people/:id", GetPerson)
-   r.POST("/people", CreatePerson)
-   r.PUT("/people/:id", UpdatePerson)
-   r.DELETE("/people/:id", DeletePerson)*/
-   //r.Use((cors.Default()))
+   //APIs for User
+   r.GET("/user/", user.GetUsers)
+   r.GET("/user/:id", user.GetUser)
+   r.POST("/user", user.CreateUser)
+   r.PUT("/user/:id", user.UpdateUser)
+   r.DELETE("/user/:id", user.DeleteUser)
 
 
 
@@ -64,7 +60,19 @@ func main() {
    r.GET("/questions/:quiz_id",question.GetAllQuestions)
    r.GET("/question/:id",question.GetQuestion)
    r.POST("/question",question.AddQuestion)
+   r.PUT("/question/:id", question.UpdateQuestion)
    r.DELETE("/question/:id",question.DeleteQuestion)
 
+   //APIs related to leaderboard
+   r.GET("/hometable/:user_id",leaderboard.ShowQuizesForUser)
+   r.POST("/leaderboard/add",leaderboard.AddToLeaderBoard)
+   //r.PUT("/leaderboard/:id",leaderboard.UpdateAddScore)
+
+   //APIs related to global leaderboard
+   r.GET("/leaderboard",leaderboard.GetGlobalLeaderBoard);
+   r.GET("/leaderboard/:genre_id",leaderboard.GetGenreLeaderBoard);
+
+
+   //r.Use((cors.Default()))
    r.Run(":8080")                                           // Run on port 8080
 }
