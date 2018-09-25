@@ -74,8 +74,9 @@ func ShowQuizesForUser(c *gin.Context) {
        Score int `json:"score"`
    }
    var result []Result
-   err = db.Table("leaderboards").Where("user_id = ?", user_id).Scan(&result).Error;
+   err = db.Table("leaderboards").Where("user_id = ?", user_id).Order("score desc").Scan(&result).Error;
    if err != nil {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(err)
    }else {
@@ -97,8 +98,8 @@ func GetGenreLeaderBoard(c *gin.Context) {
    }
    var result []Result
    err = db.Table("leaderboards").Select("user_id,sum(score) as total").Group("user_id").Order("total desc").Scan(&result).Error
-   //err = db.Table("leaderboards").Joins("left join users on users.id = leaderboards.user_id").Select("users.user_name,user_id,sum(leaderboards.score) as total").Group("user_id").Order("total desc").Scan(&leaderboard).Error
    if err != nil {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(err)
    }else {

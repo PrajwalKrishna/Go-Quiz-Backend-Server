@@ -60,12 +60,14 @@ func AddQuiz(c *gin.Context) {
 
    var quiz Quiz
    if err = c.BindJSON(&quiz); err != nil{
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
        c.JSON(400,err)
        return
    }
    fmt.Println(quiz)
    if check := db.Create(&quiz).Error;
    check != nil{
+        c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
         c.AbortWithStatus(404)
         fmt.Println(check)
    }else{
@@ -82,8 +84,9 @@ func DeleteQuiz(c *gin.Context) {
     defer db.Close()
    id := c.Params.ByName("id")
    var quiz Quiz
-   check := db.Where("id = ?", id).Delete(&quiz)
+   check := db.Where("id = ?", id).Delete(&quiz).Error
    if check != nil{
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
        c.AbortWithStatus(404)     //To be decided
        fmt.Println(err)
    }

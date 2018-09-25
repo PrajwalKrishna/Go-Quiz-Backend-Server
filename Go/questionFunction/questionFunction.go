@@ -15,6 +15,10 @@ type Question struct{
     Quiz_id uint `json:"quiz_id"`
     Multi bool `json:"multi"`
     Score int `json:"score"`
+    Option_a string `json:"option_a"`
+    Option_b string `json:"option_b"`
+    Option_c string `json:"option_c"`
+    Option_d string `json:"option_d"`
 }
 
 func DataBaseOpener() *gorm.DB{
@@ -73,6 +77,7 @@ func GetQuestion(c *gin.Context) {
    var question []Question
    if check := db.Where("id = ?", id).First(&question).Error;
    check != nil {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(check)
    }else {
@@ -89,19 +94,11 @@ func AddQuestion(c *gin.Context) {
     defer db.Close()
 
    var question Question
-   if err = c.BindJSON(&question); err != nil{
-       c.JSON(400,err)
-       return
-   }
+   c.BindJSON(&question);
    fmt.Println(question)
-   if check := db.Create(&question).Error;
-   check != nil{
-        c.AbortWithStatus(404)
-        fmt.Println(check)
-   }else{
-       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
-       c.JSON(200, question)
-   }
+   db.Create(&question);
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.JSON(200, question)
 }
 
 func DeleteQuestion(c *gin.Context) {
@@ -114,6 +111,7 @@ func DeleteQuestion(c *gin.Context) {
    var question Question
    check := db.Where("id = ?", id).Delete(&question)
    if check != nil{
+       c.Header("access-control-allow-origin", "*")
        c.AbortWithStatus(404)     //To be decided
        fmt.Println(err)
    }

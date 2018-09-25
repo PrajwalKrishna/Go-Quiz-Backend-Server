@@ -70,13 +70,9 @@ func GetUser(c *gin.Context) {
 
    id := c.Params.ByName("id")
    var user User
-   if err := db.Where("id = ?", id).First(&user).Error; err != nil {
-      c.AbortWithStatus(404)
-      fmt.Println(err)
-   } else {
-      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
-      c.JSON(200, user)
-   }
+   db.Where("id = ?", id).First(&user)
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.JSON(200, user)
 }
 
 func GetUsers(c *gin.Context) {
@@ -88,6 +84,7 @@ func GetUsers(c *gin.Context) {
 
    var users []User
    if err := db.Find(&users).Error; err != nil {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(err)
    } else {
