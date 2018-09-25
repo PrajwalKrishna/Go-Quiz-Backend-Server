@@ -24,7 +24,7 @@ func DeleteUser(c *gin.Context) {
    var user User
    d := db.Where("id = ?", id).Delete(&user)
    fmt.Println(d)
-   //c.Header("access-control-allow-origin", "*")
+   c.Header("access-control-allow-origin", "*")
    c.JSON(200, gin.H{"id #" + id: "deleted"})
 }
 
@@ -43,7 +43,7 @@ func UpdateUser(c *gin.Context) {
    }
    c.BindJSON(&user)
    db.Save(&user)
-   //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
    c.JSON(200, user)
 }
 
@@ -57,7 +57,7 @@ func CreateUser(c *gin.Context) {
    var user User
    c.BindJSON(&user)
    db.Create(&user)
-   //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
    c.JSON(200, user)
 }
 
@@ -74,7 +74,7 @@ func GetUser(c *gin.Context) {
       c.AbortWithStatus(404)
       fmt.Println(err)
    } else {
-     // c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, user)
    }
 }
@@ -91,7 +91,7 @@ func GetUsers(c *gin.Context) {
       c.AbortWithStatus(404)
       fmt.Println(err)
    } else {
-      //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, users)
    }
 }

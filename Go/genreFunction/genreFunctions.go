@@ -3,6 +3,7 @@ package genreFunction
 
 import (
     "fmt"
+    //"github.com/gin-contrib/cors"                        // Why do we need this package?
     "github.com/gin-gonic/gin"                           // Using gin as microframework
     "github.com/jinzhu/gorm"                             //Using gorm as orm
     _ "github.com/jinzhu/gorm/dialects/sqlite"           //Using sqlite as db
@@ -29,10 +30,11 @@ func GetAllGenre(c *gin.Context) {
     defer db.Close()
    var genre []Genre
    if err := db.Find(&genre).Error; err != nil {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(err)
    }else {
-//      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, genre)
    }
 }
@@ -47,11 +49,12 @@ func DeleteGenre(c *gin.Context) {
    var genre Genre
    check := db.Where("id = ?", id).Delete(&genre)
    if check != nil{
+       c.Header("access-control-allow-origin", "*")
        c.AbortWithStatus(404)     //To be decided
        fmt.Println(err)
    }
-   //c.Header("access-control-allow-origin", "*")
-   c.JSON(200, gin.H{"id #" + id: "deleted"})
+   c.Header("access-control-allow-origin", "*")
+   c.JSON(204, gin.H{"id #" + id: "deleted"})
 }
 
 func AddGenre(c *gin.Context) {
@@ -65,7 +68,7 @@ func AddGenre(c *gin.Context) {
    c.BindJSON(&genre)
    fmt.Println(genre)
    db.Create(&genre)
-   //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
    c.JSON(200, genre)
 }
 
@@ -80,10 +83,11 @@ func GetGenre(c *gin.Context) {
    var genre Genre
    if check := db.Where("id = ?", id).First(&genre).Error;
    check != nil {
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(check)
    } else {
-      //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, genre)
    }
 }

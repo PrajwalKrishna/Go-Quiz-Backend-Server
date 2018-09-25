@@ -2,6 +2,7 @@ package questionFunction
 
 import (
     "fmt"
+    //"github.com/gin-contrib/cors"                        // Why do we need this package?
     "github.com/gin-gonic/gin"                           // Using gin as microframework
     "github.com/jinzhu/gorm"                             //Using gorm as orm
     _ "github.com/jinzhu/gorm/dialects/sqlite"           //Using sqlite as db
@@ -40,7 +41,7 @@ func UpdateQuestion(c *gin.Context) {
    }
    c.BindJSON(&question)
    db.Save(&question)
-   //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
    c.JSON(200, question)
 }
 
@@ -57,7 +58,7 @@ func GetAllQuestions(c *gin.Context) {
       c.AbortWithStatus(404)
       fmt.Println(check)
    }else {
-//      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, question)
    }
 }
@@ -75,7 +76,7 @@ func GetQuestion(c *gin.Context) {
       c.AbortWithStatus(404)
       fmt.Println(check)
    }else {
-//      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, question)
    }
 }
@@ -98,7 +99,7 @@ func AddQuestion(c *gin.Context) {
         c.AbortWithStatus(404)
         fmt.Println(check)
    }else{
-       //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
        c.JSON(200, question)
    }
 }
@@ -116,6 +117,6 @@ func DeleteQuestion(c *gin.Context) {
        c.AbortWithStatus(404)     //To be decided
        fmt.Println(err)
    }
-   //c.Header("access-control-allow-origin", "*")
+   c.Header("access-control-allow-origin", "*")
    c.JSON(200, gin.H{"id #" + id: "deleted"})
 }

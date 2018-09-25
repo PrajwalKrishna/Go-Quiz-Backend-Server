@@ -2,7 +2,7 @@ package main
 
 import (
    "fmt"
- //  "github.com/gin-contrib/cors"                        // Why do we need this package?
+  "github.com/gin-contrib/cors"                        // Why do we need this package?
    "github.com/gin-gonic/gin"                           // Using gin as microframework
    "github.com/jinzhu/gorm"                             //Using gorm as orm
    _ "github.com/jinzhu/gorm/dialects/sqlite"           //Using sqlite as db
@@ -50,7 +50,7 @@ func main() {
    r.DELETE("/genre/:id",genre.DeleteGenre)
 
    //APIs related to quiz
-   r.GET("/quizs/:genre_id",quiz.GetAllQuizs)
+   r.GET("/quizes/:genre_id",quiz.GetAllQuizs)
    r.GET("/quiz/:id",quiz.GetQuiz)
    r.POST("/quiz",quiz.AddQuiz)
    r.DELETE("/quiz/:id",quiz.DeleteQuiz)
@@ -66,13 +66,13 @@ func main() {
    //APIs related to leaderboard
    r.GET("/hometable/:user_id",leaderboard.ShowQuizesForUser)
    r.POST("/leaderboard/add",leaderboard.AddToLeaderBoard)
-   //r.PUT("/leaderboard/:id",leaderboard.UpdateAddScore)
+  //r.PUT("/leaderboard/:addent",leaderboard.UpdateAddScore)
 
    //APIs related to global leaderboard
-   r.GET("/leaderboard",leaderboard.GetGlobalLeaderBoard);
-   r.GET("/leaderboard/:genre_id",leaderboard.GetGenreLeaderBoard);
+   r.GET("/leaderboard/",leaderboard.GetGlobalLeaderBoard);
+   //r.GET("/leaderboard/:genre_id",leaderboard.GetGenreLeaderBoard);
 
 
-   //r.Use((cors.Default()))
+   r.Use((cors.Default()))
    r.Run(":8080")                                           // Run on port 8080
 }

@@ -2,13 +2,14 @@ package leaderboardFunction
 
 import (
     "fmt"
+    //"github.com/gin-contrib/cors"                        // Why do we need this package?
     "github.com/gin-gonic/gin"                           // Using gin as microframework
     "github.com/jinzhu/gorm"                             //Using gorm as orm
     _ "github.com/jinzhu/gorm/dialects/sqlite"           //Using sqlite as db
 )
 
 type Leaderboard struct{
-//    ID uint `json:"id"`
+    ID uint `json:"id"`
     User_id uint `gorm:"unique_index:idx_name_code" json:"user_id"`
     Quiz_id uint `gorm:"unique_index:idx_name_code" json:"quiz_id"`
     Score int `json:"score"`
@@ -33,7 +34,7 @@ func AddToLeaderBoard(c *gin.Context) {
        leaderboard.Score = 0
        db.Save(&leaderboard)
    }
-   //c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
    c.JSON(200, leaderboard)
 }
 
@@ -55,7 +56,7 @@ func GetGlobalLeaderBoard(c *gin.Context) {
       c.AbortWithStatus(404)
       fmt.Println(err)
    }else {
-//      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, result)
    }
 }
@@ -78,7 +79,7 @@ func ShowQuizesForUser(c *gin.Context) {
       c.AbortWithStatus(404)
       fmt.Println(err)
    }else {
-//      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, result)
    }
 }
@@ -101,7 +102,26 @@ func GetGenreLeaderBoard(c *gin.Context) {
       c.AbortWithStatus(404)
       fmt.Println(err)
    }else {
-//      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, result)
    }
 }
+/*func UpdateAddScore(c *gin.Context) {
+    db, err := gorm.Open("sqlite3", "./gorm.db")
+    if err != nil {
+        panic("failed to connect table")
+    }
+    defer db.Close()
+
+   var leaderboard Leaderboard
+   addent := c.Params.ByName("addent")
+   if err := db.Where("id = ?", id).First(&leaderboard).Error; err != nil {
+      c.AbortWithStatus(404)
+      fmt.Println(err)
+   }
+   c.BindJSON(&leaderboard)
+   db.Save(&leaderboard)
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.JSON(200, user)
+}
+*/
