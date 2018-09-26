@@ -10,8 +10,11 @@ import (
 
 type User struct {
    ID uint `json:"id"`
-   UserName string `gorm:"unique_index" json:"username"`
-   PassWord string `json:"password"`
+   UserName string `gorm:"unique_index" json:"user_name"`
+   Name string `json:"name"`
+   Email string `json:"email"`
+   Password string `json:"password"`
+   Admin bool `json:"admin"`
 }
 
 func DeleteUser(c *gin.Context) {
@@ -56,9 +59,14 @@ func CreateUser(c *gin.Context) {
 
    var user User
    c.BindJSON(&user)
-   db.Create(&user)
-   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
-   c.JSON(200, user)
+   check := db.Create(&user).Error
+   if(check != nil){
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+       c.AbortWithStatus(404)
+   }else{
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+       c.JSON(200, user)
+   }
 }
 
 func GetUser(c *gin.Context) {
@@ -91,4 +99,30 @@ func GetUsers(c *gin.Context) {
       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.JSON(200, users)
    }
+}
+func ValidateUser(c *gin.Context) {
+    db, err := gorm.Open("sqlite3", "./gorm.db")
+    if err != nil {
+        panic("failed to connect table")
+    }
+    defer db.Close()
+
+   var user User
+   c.BindJSON(&user)
+   var user2 User
+   db.Where("user_name = ?", user.UserName).First(&user2)
+   if(user2.ID == 0){
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+       c.AbortWithStatus(401)
+       c.JSON(401,"UserName does not exist")
+       return
+   }
+   if(user2.Password != user.Password){
+       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+       c.AbortWithStatus(401)
+       c.JSON(401,"PassWord is wrong")
+       return
+   }
+   c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+   c.JSON(200, user2)
 }
