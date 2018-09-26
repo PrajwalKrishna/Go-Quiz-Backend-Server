@@ -66,11 +66,12 @@ func main() {
    //APIs related to leaderboard
    r.GET("/hometable/:user_id",leaderboard.ShowQuizesForUser)
    r.POST("/leaderboard/add",leaderboard.AddToLeaderBoard)
-  //r.PUT("/leaderboard/:addent",leaderboard.UpdateAddScore)
+   r.PUT("/leaderboard/:id",leaderboard.UpdateScore)
 
    //APIs related to global leaderboard
    r.GET("/leaderboard/",leaderboard.GetGlobalLeaderBoard);
-   //r.GET("/leaderboard/:genre_id",leaderboard.GetGenreLeaderBoard);
+   r.GET("/leaderboard/:genre_id",leaderboard.GetGenreLeaderBoard);
+   r.GET("/leaderboardDisplay/:user_id/:quiz_id",leaderboard.GetQuizLeaderBoard);
 
 
    r.Use((cors.Default()))

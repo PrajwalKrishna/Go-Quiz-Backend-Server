@@ -45,14 +45,14 @@ func GetGlobalLeaderBoard(c *gin.Context) {
     }
     defer db.Close()
    type Result struct{
+       Total int `json:"total"`
        User_name string `json:"user_name"`
        User_id uint `json:"id"`
-       Total int `json:"total"`
    }
    var result []Result
-   err = db.Table("leaderboards").Select("user_id,sum(score) as total").Group("user_id").Order("total desc").Scan(&result).Error
-   //err = db.Table("leaderboards").Joins("left join users on users.id = leaderboards.user_id").Select("users.user_name,user_id,sum(leaderboards.score) as total").Group("user_id").Order("total desc").Scan(&leaderboard).Error
+   err = db.Raw("select sum(score) as total,user_name,user_id from leaderboards join users where user_id = users.id group by user_id order by total desc").Scan(&result).Error
    if err != nil {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(err)
    }else {
@@ -69,12 +69,12 @@ func ShowQuizesForUser(c *gin.Context) {
     defer db.Close()
    user_id := c.Params.ByName("user_id")
    type Result struct{
-       User_id uint `json:"user_id"`
+       Title string `json:title`
        Quiz_id uint `json:"quiz_id"`
        Score int `json:"score"`
    }
    var result []Result
-   err = db.Table("leaderboards").Where("user_id = ?", user_id).Order("score desc").Scan(&result).Error;
+   err = db.Raw("select score,title,quiz_id from leaderboards join quizzes where quiz_id = quizzes.id and user_id=? order by score desc;",user_id).Scan(&result).Error;
    if err != nil {
       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
@@ -91,13 +91,14 @@ func GetGenreLeaderBoard(c *gin.Context) {
         panic("failed to connect table")
     }
     defer db.Close()
+   genre_id := c.Params.ByName("genre_id")
    type Result struct{
        User_name string `json:"user_name"`
        User_id uint `json:"id"`
        Total int `json:"total"`
    }
    var result []Result
-   err = db.Table("leaderboards").Select("user_id,sum(score) as total").Group("user_id").Order("total desc").Scan(&result).Error
+   err = db.Raw("select sum(score) as total,user_id,user_name from leaderboards join quizzes on quiz_id = quizzes.id join users on user_id=users.id where quizzes.genre_id = ? group by user_id order by total desc;",genre_id).Scan(&result).Error
    if err != nil {
       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
@@ -107,22 +108,39 @@ func GetGenreLeaderBoard(c *gin.Context) {
       c.JSON(200, result)
    }
 }
-/*func UpdateAddScore(c *gin.Context) {
+func GetQuizLeaderBoard(c *gin.Context) {
     db, err := gorm.Open("sqlite3", "./gorm.db")
     if err != nil {
         panic("failed to connect table")
     }
     defer db.Close()
 
+   quiz_id := c.Params.ByName("quiz_id")
+   user_id := c.Params.ByName("user_id")
    var leaderboard Leaderboard
-   addent := c.Params.ByName("addent")
-   if err := db.Where("id = ?", id).First(&leaderboard).Error; err != nil {
+   db.Where("user_id = ? AND quiz_id = ?", user_id,quiz_id).First(&leaderboard)
+   if err != nil {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
       c.AbortWithStatus(404)
       fmt.Println(err)
+   }else {
+      c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
+      c.JSON(200, leaderboard)
    }
+}
+func UpdateScore(c *gin.Context) {
+    db, err := gorm.Open("sqlite3", "./gorm.db")
+    if err != nil {
+        panic("failed to connect table")
+    }
+    defer db.Close()
+
+   id := c.Params.ByName("id")
+
+   var leaderboard Leaderboard
+   db.Where("id = ? ",id).First(&leaderboard)
    c.BindJSON(&leaderboard)
    db.Save(&leaderboard)
    c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented
-   c.JSON(200, user)
+   c.JSON(200, leaderboard)
 }
-*/

@@ -74,7 +74,7 @@ func GetQuestion(c *gin.Context) {
     }
     defer db.Close()
    id := c.Params.ByName("id")
-   var question []Question
+   var question Question
    if check := db.Where("id = ?", id).First(&question).Error;
    check != nil {
       c.Header("access-control-allow-origin", "*") // Why am I doing this? Find out. Try running with this line commented

@@ -47,12 +47,8 @@ func DeleteGenre(c *gin.Context) {
     defer db.Close()
    id := c.Params.ByName("id")
    var genre Genre
-   check := db.Where("id = ?", id).Delete(&genre)
-   if check != nil{
-       c.Header("access-control-allow-origin", "*")
-       c.AbortWithStatus(404)     //To be decided
-       fmt.Println(err)
-   }
+   d := db.Where("id = ?", id).Delete(&genre)
+   fmt.Println(d)
    c.Header("access-control-allow-origin", "*")
    c.JSON(204, gin.H{"id #" + id: "deleted"})
 }
